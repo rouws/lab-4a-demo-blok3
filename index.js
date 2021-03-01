@@ -5,10 +5,27 @@ const slug = require('slug')
 const app = express();
 const port = 3000;
 const dotenv = require('dotenv').config();
-
-console.log(process.env.TESTVAR);
+const { MongoClient } = require('mongodb');
 
 const categories = ["action", "adventure", "sci-fi", "animation", "horror", "thriller", "fantasy", "mystery", "comedy", "family"];
+
+
+const client = new MongoClient(process.env.DB_URI);
+
+async function run() {
+  try {
+    // Connect the client to the server
+    await client.connect();
+    // Establish and verify connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Connected successfully to Mongo DB server");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+run().catch(console.dir);
+
 
 // dit is tijdelijk totdat we echt een database hebben waar we
 // de films uithalen
