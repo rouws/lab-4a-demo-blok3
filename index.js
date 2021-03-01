@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const slug = require('slug')
 const app = express();
 const port = 3000;
+const dotenv = require('dotenv').config();
+
+console.log(process.env.TESTVAR);
 
 const categories = ["action", "adventure", "sci-fi", "animation", "horror", "thriller", "fantasy", "mystery", "comedy", "family"];
 
