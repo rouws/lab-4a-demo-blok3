@@ -34,7 +34,8 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 });
 app.get('/movies', async (req, res, next) => {
-    const movies = await db.collection('movies').find({},{sort: {year: -1, name: 1}}).toArray();
+    let movies = {}
+    movies = await db.collection('movies').find({},{sort: {year: -1, name: 1}}).toArray();
     res.render('movielist', {title: 'List of all movies', movies})
 });
 app.get('/movies/add', (req, res) => {
@@ -43,7 +44,7 @@ app.get('/movies/add', (req, res) => {
 app.post('/movies/add', async (req,res) => {
   const id = slug(req.body.name);
   const movie = {"id": "id", "name": req.body.name, "year": req.body.year, "categories": req.body.categories, "storyline": req.body.storyline};
-  const newMovie = await db.collection('movies').insertOne(movie);
+  await db.collection('movies').insertOne(movie);
   res.render('moviedetails', {title: "Added a new movie", movie});
 });
 app.get('/movies/:movieId', async (req, res) => {
