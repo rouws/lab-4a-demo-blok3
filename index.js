@@ -43,9 +43,9 @@ app.post('/movies/add', (req,res) => {
   // movies.push(movie);
   // res.render('moviedetails', {title: "Added a new movie", movie})
 });
-app.get('/movies/:movieId', (req, res) => {
-    // const movie = movies.find( movie => movie.id == req.params.movieId);
-    // res.render('moviedetails', {title: "Movie details", movie})
+app.get('/movies/:movieId', async (req, res) => {
+    const movie = await db.collection('movies').findOne({ id: req.params.movieId });
+    res.render('moviedetails', {title: "Movie details", movie})
 });
 
 
