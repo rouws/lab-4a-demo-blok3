@@ -4,17 +4,27 @@ const bodyParser = require('body-parser');
 const slug = require('slug')
 const app = express();
 const port = 3000;
-const mongo = require('mongodb')
+const { MongoClient } = require('mongodb')
 const dotenv = require('dotenv').config();
 const categories = ["action", "adventure", "sci-fi", "animation", "horror", "thriller", "fantasy", "mystery", "comedy", "family"];
 
 let db = null;
-const url = process.env.DB_URI
-const options = { useUnifiedTopology: true };
-mongo.MongoClient.connect(url, options, (err, client) => {
-  if (err) { throw err }
-  db = client.db(process.env.DB_NAME)
-})
+
+async function connectDB () {
+  const uri = process.env.DB_URI
+  const options = { useUnifiedTopology: true };
+  const client = new MongoClient(uri, options)
+  await client.connect();
+  db = await client.db(process.env.DB_NAME)
+}
+connectDB()
+  .then(() => {
+    console.log('We have a connection to Mongo!')
+  })
+  .catch( error => {
+    console.log(error)
+  });
+
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('public'))
@@ -30,11 +40,11 @@ app.get('/movies', async (req, res, next) => {
 app.get('/movies/add', (req, res) => {
   res.render('add', {title: "Add movie", categories});
 });
-app.post('/movies/add', (req,res) => {
-  // const id = slug(req.body.name);
-  // const movie = {"id": "id", "name": req.body.name, "year": req.body.year, "categories": req.body.categories, "storyline": req.body.storyline};
-  // movies.push(movie);
-  // res.render('moviedetails', {title: "Added a new movie", movie})
+app.post('/movies/add', async (req,res) => {
+  const id = slug(req.body.name);
+  const movie = {"id": "id", "name": req.body.name, "year": req.body.year, "categories": req.body.categories, "storyline": req.body.storyline};
+  const newMovie = await db.collection('movies').insertOne(movie);
+  res.render('moviedetails', {title: "Added a new movie", movie});
 });
 app.get('/movies/:movieId', async (req, res) => {
     const movie = await db.collection('movies').findOne({ id: req.params.movieId });
