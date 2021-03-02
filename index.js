@@ -23,16 +23,9 @@ app.set('view engine', 'ejs')
 app.get('/', (req, res) => {
   res.send('Hello World!')
 });
-app.get('/movies', (req, res, next) => {
-    db.collection('movies')
-      .find({},{sort: {year: 1, name: -1}})
-      .toArray( (err, movies) => {
-      if (err) {
-        next(err)
-      } else {
-        res.render('movielist', {title: 'List of all movies', movies})
-      }
-    });
+app.get('/movies', async (req, res, next) => {
+    const movies = await db.collection('movies').find({},{sort: {year: -1, name: 1}}).toArray();
+    res.render('movielist', {title: 'List of all movies', movies})
 });
 app.get('/movies/add', (req, res) => {
   res.render('add', {title: "Add movie", categories});
